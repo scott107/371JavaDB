@@ -103,7 +103,7 @@ public class DBLayer {
     		periodInt = 12;
     	}
     	else{
-    		System.out.println("Life");
+    		return updateUserAdvertDataLife(TitleDesc, Categ);
     		
     	}
     	try{
@@ -131,6 +131,36 @@ public class DBLayer {
     	}
     	return resultArray;
     }
+    public Object[][] updateUserAdvertDataLife(String TitleDesc, String Categ){
+    	Object[][]  resultArray = null;
+    	PreparedStatement stmt;
+    	String query = "select AdvTitle AS Title, AdvDetails AS Description, Price, AdvDateTime AS Date from advertisements where Status_ID = 'AC' and (AdvTitle LIKE ? OR AdvDetails LIKE ?) and Category_ID = ?";
+    	try{
+    		stmt = con.prepareStatement(query);
+    		String temp = "%" + TitleDesc + "%";
+    		stmt.setString(1, temp);
+    		stmt.setString(2, temp);
+    		stmt.setString(3, Categ);
+    		ResultSet rs = stmt.executeQuery();
+    		rs.last();
+    		int rows = rs.getRow();
+    		rs.beforeFirst();
+    		resultArray = new Object [rows][4];
+    		int count = 0;
+    		while (rs.next() && count < rows){
+    			resultArray[count][0] = rs.getObject(1);
+    			resultArray[count][1] = rs.getObject(2);
+    			resultArray[count][2] = rs.getObject(3);
+    			resultArray[count][3] = rs.getObject(4);
+    			count++;
+    		}
+    	}catch(SQLException e){
+    		
+    	}
+    	return resultArray;
+    }
+    
+    
     public boolean delete(int advertID){
     	
     	PreparedStatement stmt = null;
@@ -263,7 +293,7 @@ public class DBLayer {
     		periodInt = 12;
     	}
     	else{
-    		System.out.println("Life");
+    		return updateModUnclaimedDataLife(TitleDesc, Categ);
     		
     	}
     	try{
@@ -293,6 +323,38 @@ public class DBLayer {
     	}
     	return resultArray;
     }
+    public Object[][] updateModUnclaimedDataLife(String TitleDesc, String Categ){
+    	Object[][]  resultArray = null;
+    	PreparedStatement stmt = null;
+    	String query = "select Advertisement_ID, AdvTitle, AdvDetails, Price, AdvDateTime FROM advertisements where Moderator_ID  IS NULL and (AdvTitle LIKE ? OR AdvDetails LIKE ?) and Category_ID = ?";
+    	try{
+    		String temp = "%" + TitleDesc + "%";
+    		stmt = con.prepareStatement(query);
+    		stmt.setString(1, temp);
+    		stmt.setString(2, temp);
+    		stmt.setString(3, Categ);
+    		ResultSet rs = stmt.executeQuery();
+    		rs.last();
+    		int rows = rs.getRow();
+    		rs.beforeFirst();
+    		resultArray = new Object [rows][5];
+    		int count = 0;
+    		while (rs.next() && count < rows){
+    			resultArray[count][0] = rs.getObject(1);
+    			resultArray[count][1] = rs.getObject(2);
+    			resultArray[count][2] = rs.getObject(3);
+    			resultArray[count][3] = rs.getObject(4);
+    			resultArray[count][4] = rs.getString(5);
+    			count++;
+    		}
+    		
+    	}catch(SQLException e){
+    		System.out.println("error");
+    	}
+    	return resultArray;
+    }
+    
+    
     public boolean claimAdvert(int advertID, String username){
     	
     	PreparedStatement stmt = null;
@@ -324,7 +386,7 @@ public class DBLayer {
     }
     public boolean denyAdvert(int advertID){
     	PreparedStatement stmt = null;
-    	String query = "UPDATE advertisements SET Status_ID = 'PN' WHERE Advertisement_ID = ?";
+    	String query = "UPDATE advertisements SET Status_ID = 'DI' WHERE Advertisement_ID = ?";
     	try{
     		stmt = con.prepareStatement(query);
     		stmt.setInt(1, advertID);
